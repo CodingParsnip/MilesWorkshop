@@ -98,6 +98,49 @@ ul {
     border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
     top: 32rem;
     left: 10rem;
+    /* let the egg wobble around its lower body, like a real egg rocking */
+    transform-origin: center 75%;
+    transition: transform .15s ease-out;
+}
+
+/* Jagged crack across the top of the egg (crisp SVG zigzag: white highlight + dark fissure) */
+.mission-box::before {
+    content: "";
+    position: absolute;
+    top: 4rem;
+    left: 2.62rem;
+    right: 2.69rem;
+    height: 1.5rem;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    /* grey fissure spans the full width to meet the shell; white highlight is inset so its tips don't cover the egg's grey border */
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40' preserveAspectRatio='none'><polyline points='36,23 54,5 72,21 90,8 108,24 126,6 144,22 162,7' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linejoin='round' stroke-linecap='round'/><polyline points='0,21 18,10 36,27 54,9 72,25 90,12 108,28 126,10 144,26 162,11 180,27 200,19' fill='none' stroke='%23555' stroke-width='4' stroke-linejoin='round' stroke-linecap='round'/></svg>");
+}
+
+/* Shake/rock the egg on hover: ~0.85s wobble+grow, then ~1.45s pause, repeat */
+.mission-box:hover {
+    animation: egg-shake 2.3s ease-in-out infinite;
+}
+
+@keyframes egg-shake {
+    /* wobble while slightly enlarged (first ~0.85s = 0%-37% of 2.3s) */
+    0%   { transform: scale(1)    rotate(0deg); }
+    5%   { transform: scale(1.05) rotate(-6deg); }
+    11%  { transform: scale(1.05) rotate(6deg); }
+    18%  { transform: scale(1.05) rotate(-6deg); }
+    24%  { transform: scale(1.05) rotate(5deg); }
+    31%  { transform: scale(1.03) rotate(-3deg); }
+    37%  { transform: scale(1)    rotate(0deg); }
+    /* rest at normal size (~1.45s pause) before the next wobble */
+    100% { transform: scale(1)    rotate(0deg); }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .mission-box:hover {
+        animation: none;
+    }
 }
 
 .mission-text {
