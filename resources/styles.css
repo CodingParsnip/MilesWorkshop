@@ -3,6 +3,10 @@
 *           UNIVERSAL STYLES            *
 *                                       *
 ****************************************/
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 html {
     font-family: 'Victor Mono', monospace;
     font-size: 16px;
@@ -40,7 +44,10 @@ ul {
 *                                       *
 ****************************************/
 .logo {
-    height: 13rem;
+    max-height: 13rem;
+    max-width: 100%;
+    height: auto;
+    width: auto;
     margin-top: 1.5rem;
     margin-bottom: 1rem;
 }
@@ -90,6 +97,8 @@ ul {
 .mission-box {
     display: block;
     position: absolute;
+    /* keep content-box so the egg dimensions (and the tuned crack) are unaffected by the global border-box */
+    box-sizing: content-box;
     background-color: white;
     height: 25rem;
     width: 20rem;
@@ -163,11 +172,11 @@ ul {
 *                                       *
 ****************************************/
 #products-section {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem 3rem;
     margin: 2rem 2rem 5rem 2rem;
-    justify-content: center;
-    
+    justify-items: center;
 }
 
 
@@ -181,23 +190,46 @@ ul {
     border-radius: 5rem;
 }
 
+/* grid cell: hold the image frame and label in a centered column */
+.product-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+}
+
+.product-card .center {
+    width: 100%;
+}
+
 .product {
-    display: inline-flex;
-    height: 15rem;
-    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    /* square frame that scales with the card width instead of a fixed height */
+    aspect-ratio: 1 / 1;
+    max-height: 15rem;
     background-color: white;
     border: .5rem solid darkblue;
     border-radius: 1.5rem;
+    overflow: hidden;
 }
 
-.product-card {
-    display: flex;
-    margin: 0 4rem 0 4rem;
+.product img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
 }
 
 .product-name {
+    max-width: 100%;
     padding: .5rem 1rem;
     margin-top: 1.5rem;
+    font-size: 1.25rem;
+    overflow-wrap: break-word;
     color: white;
     background-color: #3232ff;
     border: .25rem solid darkblue;
@@ -220,28 +252,53 @@ ul {
 }
 
 #team-container {
-    display: inline-flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: 2rem 3rem;
     width: 100%;
+    margin: 0;
+    padding: 0 2rem;
+    justify-items: center;
 }
 
-#team-container .center {
+/* grid cell: hold the image, name and description in a centered column */
+#team-container > .center {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 5rem;
 }
 
 .team-member {
     display: flex;
-    justify-content: space-around;
-    height: 45.6875rem;
-    width: 45.6875rem;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    /* square frame that scales with the card width instead of a fixed height */
+    aspect-ratio: 1 / 1;
+    max-height: 22rem;
+}
+
+.team-member img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
 }
 
 .team-member-name {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    font-size: 2.5rem;
+    justify-content: center;
+    width: 100%;
+    min-height: 8.5rem;
+    margin: 1rem 0;
+    padding: .5rem 1rem;
+    font-size: 2rem;
+    text-align: center;
     color: white;
     background-color: #3232ff;
     border: .5rem solid darkblue;
@@ -249,10 +306,13 @@ ul {
 }
 
 .team-description {
+    width: 100%;
+    margin: 0;
+    padding: 1rem;
     background-color: white;
     color: black;
-    font-size: 1.5rem;
-    width: 45.6875rem;
+    font-size: 1.25rem;
+    font-weight: normal;
     text-align: center;
     border: .5rem solid darkblue;
     border-radius: 1rem;
@@ -284,5 +344,25 @@ ul {
 
 footer {
     width: 100%;
-    
+
+}
+
+/****************************************
+*                                       *
+*             RESPONSIVE                *
+*                                       *
+****************************************/
+/* 3-across on desktop/tablet/large phones; step down so cards stay readable on small phones */
+@media (max-width: 560px) {
+    #products-section,
+    #team-container {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 380px) {
+    #products-section,
+    #team-container {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
