@@ -92,6 +92,8 @@ ul {
     height: 50.125rem;
     background-image: url(../resources/images/tails-working.jpg);
     background-size: cover;
+    /* keep Tails (right-of-centre in the image) in view when the cover crop kicks in on narrow/portrait screens */
+    background-position: 65% center;
     background-repeat: no-repeat;
     align-self: center;
     border: .5rem solid darkblue;
