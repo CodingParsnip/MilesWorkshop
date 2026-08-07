@@ -94,10 +94,11 @@ ul {
 ****************************************/
 #mission-statement {
     display: flex;
-    /* egg sits left-of-centre (responsively) and vertically centred, leaving Tails' face visible on the right */
+    /* egg sits toward the upper-left (responsively), leaving Tails' face visible on the lower right */
     justify-content: flex-start;
-    align-items: center;
-    padding-left: 8%;
+    align-items: flex-start;
+    padding-left: 5%;
+    padding-top: 3rem;
     margin-right: 2rem;
     margin-left: 2rem;
     margin-bottom: 2rem;
