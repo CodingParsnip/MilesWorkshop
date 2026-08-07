@@ -291,6 +291,22 @@ ul {
     flex-direction: column;
     align-items: center;
     margin-bottom: 5rem;
+    position: relative;
+    transition: transform .2s ease;
+}
+
+/* grow the whole card (image, name, description) on hover (mouse devices only) */
+@media (hover: hover) {
+    #team-container > .center:hover {
+        transform: scale(1.05);
+        z-index: 2;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #team-container > .center {
+        transition: none;
+    }
 }
 
 .team-member {
