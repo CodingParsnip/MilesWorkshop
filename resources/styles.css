@@ -218,6 +218,22 @@ ul {
     align-items: center;
     width: 100%;
     min-width: 0;
+    position: relative;
+    transition: transform .2s ease;
+}
+
+/* grow the whole card (image and label) on hover (mouse devices only) */
+@media (hover: hover) {
+    .product-card:hover {
+        transform: scale(1.05);
+        z-index: 2;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .product-card {
+        transition: none;
+    }
 }
 
 .product-card .center {
