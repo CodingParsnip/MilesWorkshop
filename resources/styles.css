@@ -179,12 +179,13 @@ ul {
 }
 
 .mission-header-text {
+    margin-bottom: 0.5rem;
     font-size: 1.8rem;
 }
 
 .mission-sub-text {
-    margin: 0 2rem 0 2rem;
-    font-size: 1.1rem;
+    margin: 0 2.5rem;
+    font-size: 0.95rem;
 }
 
 /****************************************
