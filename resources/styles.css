@@ -85,6 +85,23 @@ ul {
     background-color: #3232ff;
     border: .2rem solid darkblue;
     border-radius: 1.25rem;
+    position: relative;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+/* grow and lift the nav buttons on hover (mouse devices only) */
+@media (hover: hover) {
+    #navigation ul li:hover {
+        transform: scale(1.08);
+        box-shadow: 0 .35rem .6rem rgba(0, 0, 0, .45);
+        z-index: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #navigation ul li {
+        transition: none;
+    }
 }
 
 /****************************************
