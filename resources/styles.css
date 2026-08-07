@@ -120,8 +120,8 @@ ul {
     /* keep content-box so the egg dimensions (and the tuned crack) are unaffected by the global border-box */
     box-sizing: content-box;
     background-color: white;
-    height: 25rem;
-    width: 20rem;
+    height: 22.5rem;
+    width: 18rem;
     border: .25rem solid gray;
     -webkit-border-radius: 63px 63px 63px 63px / 108px 108px 72px 72px;
     border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
@@ -134,12 +134,12 @@ ul {
 .mission-box::before {
     content: "";
     position: absolute;
-    top: 4rem;
-    /* percentages (of the egg width) so the crack scales with the egg when it shrinks on small screens
-       (13.1% == 2.62rem and 13.45% == 2.69rem at the egg's default 20rem width) */
+    /* all percentages so the whole crack scales proportionally with the egg (of the egg's
+       content box: 16%/6% of height, 13.1%/13.45% of width == the original rem values at 20x25rem) */
+    top: 16%;
     left: 13.1%;
     right: 13.45%;
-    height: 1.5rem;
+    height: 6%;
     pointer-events: none;
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -183,7 +183,7 @@ ul {
 
 .mission-sub-text {
     margin: 0 2rem 0 2rem;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
 /****************************************
