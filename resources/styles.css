@@ -121,8 +121,8 @@ ul {
     /* keep content-box so the egg dimensions (and the tuned crack) are unaffected by the global border-box */
     box-sizing: content-box;
     background-color: white;
-    height: 22.5rem;
-    width: 18rem;
+    height: 20rem;
+    width: 16rem;
     border: .25rem solid gray;
     -webkit-border-radius: 63px 63px 63px 63px / 108px 108px 72px 72px;
     border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
@@ -175,11 +175,11 @@ ul {
 
 .mission-text {
     text-align: center;
-    margin-top: 5.25rem;
+    margin-top: 4.75rem;
 }
 
 .mission-header-text {
-    font-size: 2rem;
+    font-size: 1.8rem;
 }
 
 .mission-sub-text {
@@ -265,7 +265,7 @@ ul {
     max-width: 100%;
     padding: .5rem 1rem;
     margin-top: 1.5rem;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     overflow-wrap: break-word;
     color: white;
     background-color: #3232ff;
@@ -279,9 +279,10 @@ ul {
 *                                       *
 ****************************************/
 .header-text {
-    display: flex;
+    display: inline-block;
+    text-align: center;
     color: white;
-    font-size: 3rem;
+    font-size: 2.5rem;
     padding: .25rem 1rem .5rem 1rem;
     background-color:goldenrod;
     border: .5rem solid darkgoldenrod;
@@ -347,10 +348,10 @@ ul {
     flex-direction: column;
     justify-content: center;
     width: 100%;
-    min-height: 8.5rem;
+    min-height: 7.5rem;
     margin: 1rem 0;
     padding: .5rem 1rem;
-    font-size: 2rem;
+    font-size: 1.75rem;
     text-align: center;
     color: white;
     background-color: #3232ff;
@@ -364,7 +365,7 @@ ul {
     padding: 1rem;
     background-color: white;
     color: black;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: normal;
     text-align: center;
     border: .5rem solid darkblue;
