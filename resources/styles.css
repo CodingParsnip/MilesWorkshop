@@ -12,43 +12,84 @@
 *          BACKGROUND MUSIC             *
 *                                       *
 ****************************************/
-/* fixed music toggle in the top-right corner, present on every page */
+/* fixed mini music player in the top-right corner, present on every page */
 #audio-player {
     position: fixed;
     top: 1rem;
     right: 1rem;
     z-index: 1000;
-}
-
-#music-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 3rem;
-    height: 3rem;
-    padding: 0;
-    font-size: 1.4rem;
-    line-height: 1;
-    cursor: pointer;
+    width: 15rem;
+    max-width: calc(100vw - 2rem);
+    padding: .55rem .7rem;
     color: white;
     background-color: #3232ff;
     border: .2rem solid darkblue;
+    border-radius: 1rem;
+    box-shadow: 0 .15rem .5rem rgba(0, 0, 0, .4);
+    font-family: 'Victor Mono', monospace;
+    font-size: .95rem;
+}
+
+.ap-title {
+    display: block;
+    margin-bottom: .4rem;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ap-row {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-top: .35rem;
+}
+
+.ap-btn {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    color: white;
+    background-color: darkblue;
+    border: .12rem solid #14146e;
     border-radius: 50%;
-    box-shadow: 0 .15rem .4rem rgba(0, 0, 0, .4);
-    transition: transform .2s ease, box-shadow .2s ease;
+    transition: transform .15s ease;
 }
 
 @media (hover: hover) {
-    #music-toggle:hover {
-        transform: scale(1.08);
-        box-shadow: 0 .35rem .6rem rgba(0, 0, 0, .5);
+    .ap-btn:hover {
+        transform: scale(1.1);
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    #music-toggle {
+    .ap-btn {
         transition: none;
     }
+}
+
+.ap-range {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 1rem;
+    accent-color: gold;
+    cursor: pointer;
+}
+
+.ap-time {
+    flex: 0 0 auto;
+    font-size: .72rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }
 
 html {

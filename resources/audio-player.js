@@ -1,34 +1,66 @@
-/* Background music player for Miles' Workshop.
-   - Plays a looping track quietly in the background.
-   - Resumes position + on/off state across page navigations (via sessionStorage)
-     so audio is near-seamless when moving between pages.
+/* Background music mini-player for Miles' Workshop.
+   Features: song title, play/pause, seek bar with time, mute, volume.
+   - Plays a looping track quietly; volume is adjustable and remembered.
    - Autoplay-with-sound is blocked by browsers until the user interacts, so if the
-     initial play() is rejected we start on the first user gesture. The toggle
-     button also lets the visitor start/stop the music. */
+     initial play() is rejected we start on the first user gesture.
+   - Persists position, on/off, volume and mute in sessionStorage and resumes on the
+     next page, so audio is near-seamless when moving between pages. */
 (function () {
   var audio = document.getElementById('bg-music');
-  var btn = document.getElementById('music-toggle');
-  if (!audio || !btn) return;
+  if (!audio) return;
 
-  var KEY_TIME = 'mw-audio-time';
-  var KEY_ON = 'mw-audio-on';
+  var player = document.getElementById('audio-player');
+  var playBtn = document.getElementById('ap-play');
+  var seek = document.getElementById('ap-seek');
+  var timeEl = document.getElementById('ap-time');
+  var muteBtn = document.getElementById('ap-mute');
+  var vol = document.getElementById('ap-vol');
+
+  var K = { time: 'mw-audio-time', on: 'mw-audio-on', vol: 'mw-audio-vol', muted: 'mw-audio-muted' };
+  var DEFAULT_VOL = 0.05; // quiet background level
 
   audio.loop = true;
-  audio.volume = 0.15; // quiet background level
 
-  var savedTime = parseFloat(sessionStorage.getItem(KEY_TIME));
-  var onFlag = sessionStorage.getItem(KEY_ON);
-  var wantOn = (onFlag === null) ? true : (onFlag === '1'); // default: music on
+  // ----- restore persisted state -----
+  var savedTime = parseFloat(sessionStorage.getItem(K.time));
+  var savedOn = sessionStorage.getItem(K.on);
+  var savedVol = parseFloat(sessionStorage.getItem(K.vol));
+  var savedMuted = sessionStorage.getItem(K.muted);
 
-  // Restore the saved playback position exactly once, when the track is seekable.
+  var wantOn = (savedOn === null) ? true : (savedOn === '1');
+  audio.volume = isNaN(savedVol) ? DEFAULT_VOL : savedVol;
+  audio.muted = (savedMuted === '1');
+  if (vol) vol.value = audio.volume;
+
+  var seeking = false;
   var restored = false;
   function restoreTime() {
     if (restored || isNaN(savedTime) || audio.readyState < 1) return;
     restored = true;
     try { audio.currentTime = savedTime; } catch (e) {}
   }
-  audio.addEventListener('loadedmetadata', restoreTime);
-  if (audio.readyState >= 1) restoreTime();
+
+  // ----- helpers / display -----
+  function fmt(s) {
+    if (!isFinite(s) || s < 0) return '0:00';
+    s = Math.floor(s);
+    var m = Math.floor(s / 60), sec = s % 60;
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+  function updateTime() {
+    if (timeEl) timeEl.textContent = fmt(audio.currentTime) + ' / ' + fmt(audio.duration);
+    if (seek && !seeking && audio.duration) seek.value = audio.currentTime;
+  }
+  function updatePlayBtn() {
+    if (!playBtn) return;
+    playBtn.textContent = audio.paused ? '▶' : '⏸'; // ▶ / ⏸
+    playBtn.setAttribute('aria-pressed', String(!audio.paused));
+  }
+  function updateMuteBtn() {
+    if (!muteBtn) return;
+    var off = audio.muted || audio.volume === 0;
+    muteBtn.textContent = off ? '🔇' : '🔊'; // 🔇 / 🔊
+  }
 
   function tryPlay() {
     restoreTime();
@@ -36,41 +68,67 @@
     if (p && typeof p.catch === 'function') p.catch(function () {}); // ignore autoplay block
   }
 
-  function refreshButton() {
-    var playing = !audio.paused;
-    btn.textContent = playing ? '🔊' : '🔇'; // 🔊 / 🔇
-    btn.setAttribute('title', playing ? 'Music on — click to mute' : 'Music off — click to play');
-    btn.setAttribute('aria-pressed', String(playing));
+  // ----- metadata: set seek range + restore position -----
+  function onMeta() {
+    if (seek) seek.max = audio.duration || 0;
+    restoreTime();
+    updateTime();
   }
-  audio.addEventListener('play', refreshButton);
-  audio.addEventListener('pause', refreshButton);
+  audio.addEventListener('loadedmetadata', onMeta);
+  if (audio.readyState >= 1) onMeta();
 
-  // Try to start on load; fall back to the first user gesture if the browser blocks it.
+  audio.addEventListener('timeupdate', updateTime);
+  audio.addEventListener('play', updatePlayBtn);
+  audio.addEventListener('pause', updatePlayBtn);
+  audio.addEventListener('volumechange', updateMuteBtn);
+
+  // ----- controls -----
+  if (playBtn) playBtn.addEventListener('click', function () {
+    if (audio.paused) { wantOn = true; tryPlay(); } else { wantOn = false; audio.pause(); }
+    save();
+  });
+  if (seek) {
+    seek.addEventListener('input', function () {
+      seeking = true;
+      audio.currentTime = parseFloat(seek.value) || 0;
+      updateTime();
+    });
+    seek.addEventListener('change', function () { seeking = false; save(); });
+  }
+  if (muteBtn) muteBtn.addEventListener('click', function () {
+    audio.muted = !audio.muted;
+    if (!audio.muted && audio.volume === 0) {
+      audio.volume = DEFAULT_VOL;
+      if (vol) vol.value = DEFAULT_VOL;
+    }
+    save();
+  });
+  if (vol) vol.addEventListener('input', function () {
+    audio.volume = parseFloat(vol.value);
+    if (audio.volume > 0) audio.muted = false;
+    save();
+  });
+
+  // ----- start on load, with a first-gesture fallback -----
   if (wantOn) {
     tryPlay();
     audio.addEventListener('canplay', function () { if (wantOn && audio.paused) tryPlay(); }, { once: true });
-
-    var events = ['pointerdown', 'keydown', 'touchstart'];
+    var evs = ['pointerdown', 'keydown', 'touchstart'];
     var kick = function (e) {
-      if (btn.contains(e.target)) return; // the button handles its own clicks
+      if (player && player.contains(e.target)) return; // the player handles its own controls
       if (wantOn && audio.paused) tryPlay();
-      events.forEach(function (ev) { document.removeEventListener(ev, kick, true); });
+      evs.forEach(function (ev) { document.removeEventListener(ev, kick, true); });
     };
-    events.forEach(function (ev) { document.addEventListener(ev, kick, true); });
+    evs.forEach(function (ev) { document.addEventListener(ev, kick, true); });
   }
 
-  btn.addEventListener('click', function () {
-    if (audio.paused) { wantOn = true; tryPlay(); }
-    else { wantOn = false; audio.pause(); }
-    save();
-    refreshButton();
-  });
-
-  // Persist state so the next page can pick up where this one left off.
+  // ----- persist for near-seamless playback across pages -----
   function save() {
     try {
-      sessionStorage.setItem(KEY_TIME, String(audio.currentTime || 0));
-      sessionStorage.setItem(KEY_ON, wantOn ? '1' : '0');
+      sessionStorage.setItem(K.time, String(audio.currentTime || 0));
+      sessionStorage.setItem(K.on, wantOn ? '1' : '0');
+      sessionStorage.setItem(K.vol, String(audio.volume));
+      sessionStorage.setItem(K.muted, audio.muted ? '1' : '0');
     } catch (e) {}
   }
   var lastSave = 0;
@@ -81,5 +139,7 @@
   window.addEventListener('pagehide', save);
   window.addEventListener('beforeunload', save);
 
-  refreshButton();
+  updatePlayBtn();
+  updateMuteBtn();
+  updateTime();
 })();

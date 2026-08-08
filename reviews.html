@@ -53,7 +53,16 @@
     <!--Background music player (fixed top-right, on every page)-->
     <div id="audio-player">
       <audio id="bg-music" src="resources/audio/music-seasidehill.mp3" loop preload="auto"></audio>
-      <button id="music-toggle" type="button" aria-label="Toggle background music">🔊</button>
+      <div class="ap-title">♪ Seaside Hill</div>
+      <div class="ap-row">
+        <button id="ap-play" class="ap-btn" type="button" aria-label="Play or pause">▶</button>
+        <input id="ap-seek" class="ap-range" type="range" min="0" max="0" value="0" step="0.1" aria-label="Seek through song">
+        <span id="ap-time" class="ap-time">0:00 / 0:00</span>
+      </div>
+      <div class="ap-row">
+        <button id="ap-mute" class="ap-btn" type="button" aria-label="Mute or unmute">🔊</button>
+        <input id="ap-vol" class="ap-range" type="range" min="0" max="1" value="0.05" step="0.01" aria-label="Volume">
+      </div>
     </div>
     <script src="resources/audio-player.js"></script>
   </body>
