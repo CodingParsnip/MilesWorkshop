@@ -12,12 +12,54 @@
 *          BACKGROUND MUSIC             *
 *                                       *
 ****************************************/
-/* fixed mini music player in the top-right corner, present on every page */
+/* fixed, collapsible mini music player in the top-right corner, on every page */
 #audio-player {
     position: fixed;
     top: 1rem;
     right: 1rem;
     z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .5rem;
+    font-family: 'Victor Mono', monospace;
+    font-size: .95rem;
+}
+
+/* the always-visible collapse/expand button */
+.ap-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    color: white;
+    background-color: #3232ff;
+    border: .2rem solid darkblue;
+    border-radius: 50%;
+    box-shadow: 0 .15rem .4rem rgba(0, 0, 0, .4);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+@media (hover: hover) {
+    .ap-toggle:hover {
+        transform: scale(1.08);
+        box-shadow: 0 .35rem .6rem rgba(0, 0, 0, .5);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ap-toggle {
+        transition: none;
+    }
+}
+
+/* the expandable player panel */
+.ap-body {
     width: 15rem;
     max-width: calc(100vw - 2rem);
     padding: .55rem .7rem;
@@ -26,8 +68,10 @@
     border: .2rem solid darkblue;
     border-radius: 1rem;
     box-shadow: 0 .15rem .5rem rgba(0, 0, 0, .4);
-    font-family: 'Victor Mono', monospace;
-    font-size: .95rem;
+}
+
+#audio-player.collapsed .ap-body {
+    display: none;
 }
 
 .ap-title {

@@ -1,22 +1,27 @@
 /* Background music mini-player for Miles' Workshop.
-   Features: song title, play/pause, seek bar with time, mute, volume.
+   Collapsible: a small button expands to a panel with song title, play/pause,
+   a seek bar with time, mute and volume.
    - Plays a looping track quietly; volume is adjustable and remembered.
    - Autoplay-with-sound is blocked by browsers until the user interacts, so if the
      initial play() is rejected we start on the first user gesture.
-   - Persists position, on/off, volume and mute in sessionStorage and resumes on the
-     next page, so audio is near-seamless when moving between pages. */
+   - Persists position, on/off, volume, mute and collapsed state in sessionStorage
+     and resumes on the next page, so audio is near-seamless when moving between pages. */
 (function () {
   var audio = document.getElementById('bg-music');
   if (!audio) return;
 
   var player = document.getElementById('audio-player');
+  var toggleBtn = document.getElementById('ap-toggle');
   var playBtn = document.getElementById('ap-play');
   var seek = document.getElementById('ap-seek');
   var timeEl = document.getElementById('ap-time');
   var muteBtn = document.getElementById('ap-mute');
   var vol = document.getElementById('ap-vol');
 
-  var K = { time: 'mw-audio-time', on: 'mw-audio-on', vol: 'mw-audio-vol', muted: 'mw-audio-muted' };
+  var K = {
+    time: 'mw-audio-time', on: 'mw-audio-on', vol: 'mw-audio-vol',
+    muted: 'mw-audio-muted', collapsed: 'mw-audio-collapsed'
+  };
   var DEFAULT_VOL = 0.05; // quiet background level
 
   audio.loop = true;
@@ -26,11 +31,14 @@
   var savedOn = sessionStorage.getItem(K.on);
   var savedVol = parseFloat(sessionStorage.getItem(K.vol));
   var savedMuted = sessionStorage.getItem(K.muted);
+  var savedCollapsed = sessionStorage.getItem(K.collapsed);
 
   var wantOn = (savedOn === null) ? true : (savedOn === '1');
   audio.volume = isNaN(savedVol) ? DEFAULT_VOL : savedVol;
   audio.muted = (savedMuted === '1');
   if (vol) vol.value = audio.volume;
+
+  var collapsed = (savedCollapsed === null) ? true : (savedCollapsed === '1'); // default: collapsed
 
   var seeking = false;
   var restored = false;
@@ -39,6 +47,19 @@
     restored = true;
     try { audio.currentTime = savedTime; } catch (e) {}
   }
+
+  // ----- collapse / expand -----
+  function applyCollapsed() {
+    if (player) player.classList.toggle('collapsed', collapsed);
+    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', String(!collapsed));
+  }
+  applyCollapsed();
+  if (toggleBtn) toggleBtn.addEventListener('click', function () {
+    collapsed = !collapsed;
+    try { sessionStorage.setItem(K.collapsed, collapsed ? '1' : '0'); } catch (e) {}
+    applyCollapsed();
+    if (wantOn && audio.paused) tryPlay(); // a click is a user gesture
+  });
 
   // ----- helpers / display -----
   function fmt(s) {
@@ -115,7 +136,7 @@
     audio.addEventListener('canplay', function () { if (wantOn && audio.paused) tryPlay(); }, { once: true });
     var evs = ['pointerdown', 'keydown', 'touchstart'];
     var kick = function (e) {
-      if (player && player.contains(e.target)) return; // the player handles its own controls
+      if (playBtn && playBtn.contains(e.target)) return; // the play button manages its own state
       if (wantOn && audio.paused) tryPlay();
       evs.forEach(function (ev) { document.removeEventListener(ev, kick, true); });
     };
